@@ -3,6 +3,9 @@ import React, { Component } from 'react';
 import Image from '../../../components/Image/Image';
 import './SinglePost.css';
 
+const port = process.env.REACT_APP_PORT_NODE_JS;
+const host = process.env.REACT_APP_HOST;
+
 class SinglePost extends Component {
   state = {
     title: '',
@@ -14,7 +17,7 @@ class SinglePost extends Component {
 
   componentDidMount() {
     const postId = this.props.match.params.postId;
-    fetch('URL')
+    fetch('http://' + host + ':' + port + '/feed/post/' + postId)
       .then(res => {
         if (res.status !== 200) {
           throw new Error('Failed to fetch status');
@@ -25,6 +28,7 @@ class SinglePost extends Component {
         this.setState({
           title: resData.post.title,
           author: resData.post.creator.name,
+          image: 'http://' + host + ':' + port + '/' + resData.post.imageUrl,
           date: new Date(resData.post.createdAt).toLocaleDateString('en-US'),
           content: resData.post.content
         });

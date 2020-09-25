@@ -54,7 +54,6 @@ class Feed extends Component {
       this.setState({ postPage: page });
     }
 
-    // fetch('http://localhost:8080/feed/posts')
     fetch('http://' + host + ':' + port + '/feed/posts')
       .then(res => {
         if (res.status !== 200) {
