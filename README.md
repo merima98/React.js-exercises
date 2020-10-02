@@ -32,6 +32,10 @@
 
 - Write *npm i custom-env* in the terminal. 
 - For including write *const env = require('custom-env').env();*
+
+### 3. *WORKING WITH WEBSOCKETS & Socket.io*
+
+- Write *npm install --save socket.io-client* in the terminal. Enables implemmenting web sockets - protocol that allows user to push data from the server to connected client.
 	 
  
 	
