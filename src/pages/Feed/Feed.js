@@ -25,7 +25,7 @@ class Feed extends Component {
   };
 
   componentDidMount() {
-    fetch('http://' + host + ':' + port + '/auth/status', {
+    fetch('http://localhost:8080/auth/status', {
       headers: {
         Authorization: 'Bearer ' + this.props.token
       }
@@ -42,8 +42,6 @@ class Feed extends Component {
       .catch(this.catchError);
 
     this.loadPosts();
-
-
   }
 
   loadPosts = direction => {
@@ -60,26 +58,48 @@ class Feed extends Component {
       this.setState({ postPage: page });
     }
 
-    fetch('http://' + host + ':' + port + '/feed/posts?page=' + page, {
+    const graphqlQuery = {
+      query: `
+        {
+          posts(page: ${page}) {
+            posts {
+              _id
+              title
+              content
+              creator {
+                name
+              }
+              createdAt
+            }
+            totalPosts
+          }
+        }
+      `
+    };
+
+    fetch('http://' + host + ':' + port + '/graphql', {
+      method: 'POST',
       headers: {
-        Authorization: 'Bearer ' + this.props.token
-      }
+        Authorization: 'Bearer ' + this.props.token,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(graphqlQuery)
     })
       .then(res => {
-        if (res.status !== 200) {
-          throw new Error('Failed to fetch posts.');
-        }
         return res.json();
       })
       .then(resData => {
+        if (resData.errors) {
+          throw new Error('Fetching posts failed!');
+        }
         this.setState({
-          posts: resData.posts.map(post => {
+          posts: resData.data.posts.posts.map(post => {
             return {
               ...post,
               imagePath: post.imageUrl
             };
           }),
-          totalPosts: resData.totalItems,
+          totalPosts: resData.data.posts.totalPosts,
           postsLoading: false
         });
       })
@@ -186,8 +206,18 @@ class Feed extends Component {
           createdAt: resData.data.createPost.createdAt
         };
         this.setState(prevState => {
-
+          let updatedPosts = [...prevState.posts];
+          if (prevState.editPost) {
+            const postIndex = prevState.posts.findIndex(
+              p => p._id === prevState.editPost._id
+            );
+            updatedPosts[postIndex] = post;
+          } else {
+            updatedPosts.pop();
+            updatedPosts.unshift(post);
+          }
           return {
+            posts: updatedPosts,
             isEditing: false,
             editPost: null,
             editLoading: false
@@ -313,3 +343,8 @@ class Feed extends Component {
 }
 
 export default Feed;
+
+
+
+
+
