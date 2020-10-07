@@ -13,7 +13,6 @@ import LoginPage from './pages/Auth/Login';
 import SignupPage from './pages/Auth/Signup';
 import './App.css';
 
-
 const port = process.env.REACT_APP_PORT_NODE_JS;
 const host = process.env.REACT_APP_HOST;
 
@@ -62,17 +61,21 @@ class App extends Component {
 
   loginHandler = (event, authData) => {
     event.preventDefault();
-    this.setState({ authLoading: true });
     const graphqlQuery = {
       query: `
-        {
-          login(email: "${authData.email}", password: "${authData.password}") {
+        query UserLogin($email: String!, $password: String!) {
+          login(email: $email, password: $password) {
             token
-            userId 
+            userId
           }
         }
-      `
+      `,
+      variables: {
+        email: authData.email,
+        password: authData.password
+      }
     };
+    this.setState({ authLoading: true });
     fetch('http://' + host + ':' + port + '/graphql', {
       method: 'POST',
       headers: {
@@ -123,13 +126,18 @@ class App extends Component {
     this.setState({ authLoading: true });
     const graphqlQuery = {
       query: `
-        mutation {
-          createUser(userInput: {email: "${authData.signupForm.email.value}" , password: "${authData.signupForm.password.value}", name:"${authData.signupForm.name.value}"}){
+        mutation CreateNewUser($email: String!, $name: String!, $password: String!) {
+          createUser(userInput: {email: $email, name: $name, password: $password}) {
             _id
             email
           }
         }
-      `
+      `,
+      variables: {
+        email: authData.signupForm.email.value,
+        name: authData.signupForm.name.value,
+        password: authData.signupForm.password.value
+      }
     };
     fetch('http://' + host + ':' + port + '/graphql', {
       method: 'POST',
@@ -139,8 +147,6 @@ class App extends Component {
       body: JSON.stringify(graphqlQuery)
     })
       .then(res => {
-
-
         return res.json();
       })
       .then(resData => {
