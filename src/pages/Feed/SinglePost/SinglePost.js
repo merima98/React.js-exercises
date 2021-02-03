@@ -1,20 +1,18 @@
-import React, { Component } from 'react';
+import React, { Component } from "react";
 
-import Image from '../../../components/Image/Image';
-import './SinglePost.css';
-
+import Image from "../../../components/Image/Image";
+import "./SinglePost.css";
 
 const port = process.env.REACT_APP_PORT_NODE_JS;
 const host = process.env.REACT_APP_HOST;
 
-
 class SinglePost extends Component {
   state = {
-    title: '',
-    author: '',
-    date: '',
-    image: '',
-    content: ''
+    title: "",
+    author: "",
+    date: "",
+    image: "",
+    content: "",
   };
 
   componentDidMount() {
@@ -33,35 +31,36 @@ class SinglePost extends Component {
         }
       `,
       variables: {
-        postId: postId
-      }
-    };
-    fetch('http://' + host + ':' + port + '/graphql', {
-      method: 'POST',
-      headers: {
-        Authorization: 'Bearer ' + this.props.token,
-        'Content-Type': 'application/json'
+        postId: postId,
       },
-      body: JSON.stringify(graphqlQuery)
+    };
+    fetch("http://" + host + ":" + port + "/graphql", {
+      method: "POST",
+      headers: {
+        Authorization: "Bearer " + this.props.token,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(graphqlQuery),
     })
-      .then(res => {
+      .then((res) => {
         return res.json();
       })
-      .then(resData => {
+      .then((resData) => {
         if (resData.errors) {
-          throw new Error('Fetching post failed!');
+          throw new Error("Fetching post failed!");
         }
         this.setState({
           title: resData.data.post.title,
           author: resData.data.post.creator.name,
-          image: 'http://' + host + ':' + port + '/' + resData.data.post.imageUrl,
-          date: new Date(resData.data.post.createdAt).toLocaleDateString('en-US'),
-          content: resData.data.post.content
+          image:
+            "http://" + host + ":" + port + "/" + resData.data.post.imageUrl,
+          date: new Date(resData.data.post.createdAt).toLocaleDateString(
+            "en-US"
+          ),
+          content: resData.data.post.content,
         });
       })
-      .catch(err => {
-        console.log(err);
-      });
+      .catch((err) => {});
   }
 
   render() {

@@ -1,17 +1,17 @@
-import React, { Component, Fragment } from 'react';
-import { Route, Switch, Redirect, withRouter } from 'react-router-dom';
+import React, { Component, Fragment } from "react";
+import { Route, Switch, Redirect, withRouter } from "react-router-dom";
 
-import Layout from './components/Layout/Layout';
-import Backdrop from './components/Backdrop/Backdrop';
-import Toolbar from './components/Toolbar/Toolbar';
-import MainNavigation from './components/Navigation/MainNavigation/MainNavigation';
-import MobileNavigation from './components/Navigation/MobileNavigation/MobileNavigation';
-import ErrorHandler from './components/ErrorHandler/ErrorHandler';
-import FeedPage from './pages/Feed/Feed';
-import SinglePostPage from './pages/Feed/SinglePost/SinglePost';
-import LoginPage from './pages/Auth/Login';
-import SignupPage from './pages/Auth/Signup';
-import './App.css';
+import Layout from "./components/Layout/Layout";
+import Backdrop from "./components/Backdrop/Backdrop";
+import Toolbar from "./components/Toolbar/Toolbar";
+import MainNavigation from "./components/Navigation/MainNavigation/MainNavigation";
+import MobileNavigation from "./components/Navigation/MobileNavigation/MobileNavigation";
+import ErrorHandler from "./components/ErrorHandler/ErrorHandler";
+import FeedPage from "./pages/Feed/Feed";
+import SinglePostPage from "./pages/Feed/SinglePost/SinglePost";
+import LoginPage from "./pages/Auth/Login";
+import SignupPage from "./pages/Auth/Signup";
+import "./App.css";
 
 const port = process.env.REACT_APP_PORT_NODE_JS;
 const host = process.env.REACT_APP_HOST;
@@ -24,12 +24,12 @@ class App extends Component {
     token: null,
     userId: null,
     authLoading: false,
-    error: null
+    error: null,
   };
 
   componentDidMount() {
-    const token = localStorage.getItem('token');
-    const expiryDate = localStorage.getItem('expiryDate');
+    const token = localStorage.getItem("token");
+    const expiryDate = localStorage.getItem("expiryDate");
     if (!token || !expiryDate) {
       return;
     }
@@ -37,14 +37,14 @@ class App extends Component {
       this.logoutHandler();
       return;
     }
-    const userId = localStorage.getItem('userId');
+    const userId = localStorage.getItem("userId");
     const remainingMilliseconds =
       new Date(expiryDate).getTime() - new Date().getTime();
     this.setState({ isAuth: true, token: token, userId: userId });
     this.setAutoLogout(remainingMilliseconds);
   }
 
-  mobileNavHandler = isOpen => {
+  mobileNavHandler = (isOpen) => {
     this.setState({ showMobileNav: isOpen, showBackdrop: isOpen });
   };
 
@@ -54,9 +54,9 @@ class App extends Component {
 
   logoutHandler = () => {
     this.setState({ isAuth: false, token: null });
-    localStorage.removeItem('token');
-    localStorage.removeItem('expiryDate');
-    localStorage.removeItem('userId');
+    localStorage.removeItem("token");
+    localStorage.removeItem("expiryDate");
+    localStorage.removeItem("userId");
   };
 
   loginHandler = (event, authData) => {
@@ -72,51 +72,49 @@ class App extends Component {
       `,
       variables: {
         email: authData.email,
-        password: authData.password
-      }
+        password: authData.password,
+      },
     };
     this.setState({ authLoading: true });
-    fetch('http://' + host + ':' + port + '/graphql', {
-      method: 'POST',
+    fetch("http://" + host + ":" + port + "/graphql", {
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json'
+        "Content-Type": "application/json",
       },
-      body: JSON.stringify(graphqlQuery)
+      body: JSON.stringify(graphqlQuery),
     })
-      .then(res => {
+      .then((res) => {
         return res.json();
       })
-      .then(resData => {
+      .then((resData) => {
         if (resData.errors && resData.errors[0].status === 422) {
           throw new Error(
             "Validation failed. Make sure the email address isn't used yet!"
           );
         }
         if (resData.errors) {
-          throw new Error('User login failed!');
+          throw new Error("User login failed!");
         }
-        console.log(resData);
         this.setState({
           isAuth: true,
           token: resData.data.login.token,
           authLoading: false,
-          userId: resData.data.login.userId
+          userId: resData.data.login.userId,
         });
-        localStorage.setItem('token', resData.data.login.token);
-        localStorage.setItem('userId', resData.data.login.userId);
+        localStorage.setItem("token", resData.data.login.token);
+        localStorage.setItem("userId", resData.data.login.userId);
         const remainingMilliseconds = 60 * 60 * 1000;
         const expiryDate = new Date(
           new Date().getTime() + remainingMilliseconds
         );
-        localStorage.setItem('expiryDate', expiryDate.toISOString());
+        localStorage.setItem("expiryDate", expiryDate.toISOString());
         this.setAutoLogout(remainingMilliseconds);
       })
-      .catch(err => {
-        console.log(err);
+      .catch((err) => {
         this.setState({
           isAuth: false,
           authLoading: false,
-          error: err
+          error: err,
         });
       });
   };
@@ -136,43 +134,41 @@ class App extends Component {
       variables: {
         email: authData.signupForm.email.value,
         name: authData.signupForm.name.value,
-        password: authData.signupForm.password.value
-      }
-    };
-    fetch('http://' + host + ':' + port + '/graphql', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
+        password: authData.signupForm.password.value,
       },
-      body: JSON.stringify(graphqlQuery)
+    };
+    fetch("http://" + host + ":" + port + "/graphql", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(graphqlQuery),
     })
-      .then(res => {
+      .then((res) => {
         return res.json();
       })
-      .then(resData => {
+      .then((resData) => {
         if (resData.errors && resData.errors[0].status === 422) {
           throw new Error(
             "Validation failed. Make sure the email address isn't used yet!"
           );
         }
         if (resData.errors) {
-          throw new Error('User creation failed!');
+          throw new Error("User creation failed!");
         }
-        console.log(resData);
         this.setState({ isAuth: false, authLoading: false });
-        this.props.history.replace('/');
+        this.props.history.replace("/");
       })
-      .catch(err => {
-        console.log(err);
+      .catch((err) => {
         this.setState({
           isAuth: false,
           authLoading: false,
-          error: err
+          error: err,
         });
       });
   };
 
-  setAutoLogout = milliseconds => {
+  setAutoLogout = (milliseconds) => {
     setTimeout(() => {
       this.logoutHandler();
     }, milliseconds);
@@ -188,7 +184,7 @@ class App extends Component {
         <Route
           path="/"
           exact
-          render={props => (
+          render={(props) => (
             <LoginPage
               {...props}
               onLogin={this.loginHandler}
@@ -199,7 +195,7 @@ class App extends Component {
         <Route
           path="/signup"
           exact
-          render={props => (
+          render={(props) => (
             <SignupPage
               {...props}
               onSignup={this.signupHandler}
@@ -216,13 +212,13 @@ class App extends Component {
           <Route
             path="/"
             exact
-            render={props => (
+            render={(props) => (
               <FeedPage userId={this.state.userId} token={this.state.token} />
             )}
           />
           <Route
             path="/:postId"
-            render={props => (
+            render={(props) => (
               <SinglePostPage
                 {...props}
                 userId={this.state.userId}

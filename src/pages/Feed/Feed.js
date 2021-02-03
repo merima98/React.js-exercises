@@ -146,8 +146,7 @@ class Feed extends Component {
       .then(resData => {
         if (resData.errors) {
           throw new Error('Fetching posts failed!');
-        }
-        console.log(resData);
+        } 
       })
       .catch(this.catchError);
   };
@@ -294,8 +293,7 @@ class Feed extends Component {
           };
         });
       })
-      .catch(err => {
-        console.log(err);
+      .catch(err => { 
         this.setState({
           isEditing: false,
           editPost: null,
@@ -332,12 +330,10 @@ class Feed extends Component {
       .then(resData => {
         if (resData.errors) {
           throw new Error('Deleting the post failed!');
-        }
-        console.log(resData);
+        } 
         this.loadPosts();
       })
-      .catch(err => {
-        console.log(err);
+      .catch(err => { 
         this.setState({ postsLoading: false });
       });
   };
